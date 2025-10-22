@@ -14,7 +14,9 @@ debugger0_a: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamicall
 ```
 - After confirming it was an ELF 64-bit executable, I launched an Ubuntu x86-64 Docker container and installed neccesary dependencies to use `file` and `string`. I reffered to Gemini for the syntax.
 <img width="1280" height="832" alt="Screenshot 2025-10-22 at 8 01 17 PM" src="https://github.com/user-attachments/assets/646391e1-4019-4f68-b0b5-3106d911a74a" />
+
 - I made the file executable using `chmod +x` but that was no help so as per the hint I installed `gdb` the syntax for which i got from a tutorial video I got on youtube about `gdb` the link to which I have provided in the refferences
+
 ```
 root@cc71042c3bbd:/shared# apt-get install gdb
 ```
@@ -76,5 +78,6 @@ picoCTF{549698}
 .
 .
 .
+
 
 
