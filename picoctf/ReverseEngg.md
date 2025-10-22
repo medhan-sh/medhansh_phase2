@@ -61,7 +61,7 @@ picoCTF{549698}
 
 ## Notes:
 
-- rosetta error- the file was in `x86-64` and i use a mac so naturally i ran an ARM version of ubuntu of my terminal which gave me this error i fixed it by using the `x86-64` version of Ubuntu 
+- rosetta error- the file was in `x86-64` and i use a mac so naturally i ran an ARM version of ubuntu on my terminal which gave me this error i fixed it by using the `x86-64` version of Ubuntu 
 
 ## Resources:
 
@@ -71,13 +71,7 @@ picoCTF{549698}
 
 ***
 
-# 2. Challenge name
 
-> Description
-
-.
-.
-.
 
 
 
