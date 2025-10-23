@@ -65,11 +65,51 @@ picoCTF{549698}
 
 ## Resources:
 
-- Reverse Engineering -GDB( GNU debugger) - https://www.youtube.com/watch?v=1iptoUKXrcI
+- Reverse Engineering -GDB( GNU debugger) by IronByte - https://www.youtube.com/watch?v=1iptoUKXrcI
 - Geminini
 
 
 ***
+
+# 2. ARMssembly 1
+
+> For what argument does this program print `win` with variables 81, 0 and 3? File: chall_1.S Flag format: picoCTF{XXXXXXXX} -> (hex, lowercase, no 0x, and 32 bits. ex. 5614267 would be picoCTF{0055aabb})
+
+## Solution:
+
+- Include as many steps as you can with your thought process
+- You **must** include images such as screenshots wherever relevant.
+
+```
+put codes & terminal outputs here using triple backticks
+
+you may also use ```python for python codes for example
+```
+
+## Flag:
+
+```
+picoCTF{}
+```
+
+## Concepts learnt:
+
+- Include the new topics you've come across and explain them in brief
+- 
+
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
+
 
 
 
