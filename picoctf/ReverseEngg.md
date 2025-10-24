@@ -194,6 +194,62 @@ Comparison (cmp): Setting flags for branching
 
 ***
 
+# 3. VaultDoor 3 
+
+> This vault uses for-loops and byte arrays. The source code for this vault is here: VaultDoor3.java
+
+## Solution:
+
+- Opened the java file on VS code 
+<img width="1280" height="832" alt="Screenshot 2025-10-24 at 7 16 58 PM" src="https://github.com/user-attachments/assets/8017023f-2984-4f2b-b153-ca6e1b4a1b07" />
+
+- The code first deletes picoCTF{} from the input .
+- Then it checks if the input is 32 characters then scrambles it according to the `for` loops.
+
+```
+for (i=0; i<8; i++) {
+buffer[i] = password.charAt(i);
+}
+for (; i<16; i++) {
+buffer[i] = password.charAt(23-i);
+}
+for (; i<32; i+=2) {
+buffer[i] = password.charAt(46-i);
+}
+for (i=31; i>=17; i-=2) {
+buffer[i] = password.charAt(i);
+ }
+```
+- Made an Excel sheet corresponding to the `i` values given in the code.
+
+<img width="1280" height="832" alt="Screenshot 2025-10-24 at 7 09 19 PM" src="https://github.com/user-attachments/assets/0c0179a5-b518-4e3c-8c60-70585ec01c76" />
+
+- Manually unscrambled the password by replacing the characters according to the table.
+
+
+## Flag:
+
+```
+picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_1fb380}
+```
+
+## Concepts learnt:
+
+- Static Analysis - Reading the code without running it 
+- working backwords to achieve the desired condition.
+
+## Notes:
+
+- Did not account that i started from 0 not 1 so messed up the counting a little getting the wrong flag.
+
+## Resources:
+
+NONE
+
+
+***
+
+
 
 
 
