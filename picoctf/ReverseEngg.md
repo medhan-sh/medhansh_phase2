@@ -77,37 +77,124 @@ picoCTF{549698}
 
 ## Solution:
 
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
+- Used `file` to understand the type of the file then used `cat` to read the contents of the file .
+- The file was in Assembler Source used the video given in refference to understand the assembly code
+```
+main:
+	stp	x29, x30, [sp, -48]!
+	add	x29, sp, 0
+	str	w0, [x29, 28]
+	str	x1, [x29, 16]
+  ldr	x0, [x29, 16]
+	add	x0, x0, 8
+	ldr	x0, [x0]
+	bl	atoi
+	str	w0, [x29, 44]
+```
+- This program first stores stores our input by creating an array of string pointer `argv` then it skips argv[0] by adding `8` which is the no. of bytes in a pointer
+- The string is then coverted to integer using `atoi`
+
+ ```
+	ldr	w0, [x29, 44]
+	bl	func
+	cmp	w0, 0
+	bne	.L4
+	adrp	x0, .LC0
+	add	x0, x0, :lo12:.LC0
+	bl	puts
+	b	.L6
+  ```
+  - This calls the function `func` and checks for result if the output is 0 we win.
+```
+func:
+	sub	sp, sp, #32
+	str	w0, [sp, 12]
+	mov	w0, 81
+	str	w0, [sp, 16]
+	str	wzr, [sp, 20]
+	mov	w0, 3
+	str	w0, [sp, 24]
+	ldr	w0, [sp, 20]
+	ldr	w1, [sp, 16]
+	lsl	w0, w1, w0
+	str	w0, [sp, 28]
+	ldr	w1, [sp, 28]
+	ldr	w0, [sp, 24]
+	sdiv	w0, w1, w0
+	str	w0, [sp, 28]
+	ldr	w1, [sp, 28]
+	ldr	w0, [sp, 12]
+	sub	w0, w1, w0
+	str	w0, [sp, 28]
+	ldr	w0, [sp, 28]
+	add	sp, sp, 32
+	ret
+	.size	func, .-func
+	.section	.rodata
+	.align	3
 
 ```
-put codes & terminal outputs here using triple backticks
+- The function already has 81,3,0 hardwired in the program and it is employing our input.
+- It performs three mathematical operation in the fllowing order
 
-you may also use ```python for python codes for example
 ```
+ldr	w0, [sp, 20]
+ldr	w1, [sp, 16]
+lsl	w0, w1, w0
+str	w0, [sp, 28]
+```
+```
+ldr	w1, [sp, 28]
+ldr	w0, [sp, 24]
+sdiv	w0, w1, w0
+str	w0, [sp, 28]
+```
+```
+ldr	w1, [sp, 28]
+ldr	w0, [sp, 12]
+sub	w0, w1, w0
+str	w0, [sp, 28]
+```
+- The first operation loads the two numbers stored at `w0, [sp, 20]`=0 and `w1, [sp, 16]`=81 and cheks for `81>>0` and then stores the output at `w0, [sp, 28]`.
+- Simmilarly the next operation loads the previous output and divides it by `w0, [sp, 24]`=3
+- The program then subtracts our input from the output if the answer is 0 we win 
+Therefore:
+(81>>0)/3 - input=0
+27 - input = 0
+`input=27`
+- As per the instruction in the challenge changed it to hex to get `0000001b` employed that in the format to obtain the flag.
+
+<img width="1280" height="832" alt="Screenshot 2025-10-24 at 6 26 27 PM" src="https://github.com/user-attachments/assets/763d625c-c336-4628-8d26-b51a5d65e4eb" />
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{0000001b}
 ```
 
 ## Concepts learnt:
 
-- Include the new topics you've come across and explain them in brief
-- 
-
+- Understanding ARM64 assembly instruction .
+- `w0` in assembly are temporary registers and they can be reused multiple times
+-  Common Operations:
+Left shift (lsl): Bitwise operation (multiply by powers of 2)
+Division (sdiv): Signed integer division
+Subtraction (sub): Basic arithmetic
+Comparison (cmp): Setting flags for branching
+- Understanding the `.S` file format. 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- Followed the vid given in refference.
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- https://www.youtube.com/watch?v=1d-6Hv1c39c- simmilar to this challenge
+- Took help of claude AI to understand the assembly instruction.
 
 
 ***
+
+
 
 
 
