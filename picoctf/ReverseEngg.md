@@ -240,7 +240,7 @@ picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_1fb380}
 
 ## Notes:
 
-- Did not account that i started from 0 not 1 so messed up the counting a little getting the wrong flag.
+- Did not account that `i` started from `0` not `1` so messed up the counting a little getting the wrong flag.
 
 ## Resources:
 
@@ -248,6 +248,7 @@ NONE
 
 
 ***
+
 
 
 
