@@ -59,23 +59,18 @@ picoCTF{su((3ss_(r@ck1ng_r3@_60f50766}
 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- RSA encryption has a special mathemathical property the encryption of (Message 1 × Message 2) is equal to (Encryption of Message 1 × Encryption of Message 2).
+- Basic application of python
+- Understanding different data encoding the output the decrypter gave was in hex which needed to be cahnged to decimal using python and also when I provided the input `2` its read it as teh ascii character `50`.
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- Gemini AI helped me with understanding Python
+- https://www.youtube.com/watch?v=hm8s6FAc4pg&t=163s- used this video to understand what rsa is.
 
 
 ***
 
-# 2. Challenge name
-
-> Description
-
-.
-.
-.
 
 
 
