@@ -11,7 +11,7 @@ After some intensive reconassainance they found out that the bank has an oracle 
 
 <img width="1280" height="832" alt="Screenshot 2025-10-27 at 12 01 09 AM" src="https://github.com/user-attachments/assets/6c564974-318d-480c-8479-04eccbe2a197" />
 
-- The oracle would decrypt anything but the password so i multiply the password to a number then divide bu the same number after decrypting to obtain the key.
+- The oracle would decrypt anything but the password so i multiply the password to a number then divide by the same number after decrypting to obtain the key.
 ```
 2336150584734702647514724021470643922433811330098144930425575029773908475892259185520495303353109615046654428965662643241365308392679139063000973730368839root@cc71042c3bbd:/shared# cat secret.enc
 Salted__jX???9V)?pT3Ͼq?$?qEs?5?n\K5=?%c??	?Q?9s?1!quM?0??4??
@@ -76,4 +76,5 @@ picoCTF{su((3ss_(r@ck1ng_r3@_60f50766}
 .
 .
 .
+
 
