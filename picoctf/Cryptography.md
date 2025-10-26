@@ -28,7 +28,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> print(result)
 10997708943982761084006315359417483254965299487204584192712335192036789472336196626179282134890223733758401125471056267054908321079024432384222437910457194483711112753102678178170094968585207806212096960492328042941752878907452001886104974213833155189826877814877017136978779880432127774578986380439317174695
 ```
-- I decrypted this number using the oracle then output needed to be turned from hex to decimal than divided by `50` which is the ascii value of `2` so used a python program to do that and obtain the key .
+- I decrypted this number using the oracle the output needed to be turned from hex to decimal then divided by `50` which is the ascii value of `2` so used a python program to do that and obtain the key .
 
 ```
 >>> import binascii
@@ -76,5 +76,6 @@ picoCTF{su((3ss_(r@ck1ng_r3@_60f50766}
 .
 .
 .
+
 
 
