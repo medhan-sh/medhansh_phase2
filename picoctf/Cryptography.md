@@ -54,14 +54,13 @@ picoCTF{su((3ss_(r@ck1ng_r3@_60f50766}
 
 ## Concepts learnt:
 
-- Include the new topics you've come across and explain them in brief
-- 
-
-## Notes:
-
 - RSA encryption has a special mathemathical property the encryption of (Message 1 × Message 2) is equal to (Encryption of Message 1 × Encryption of Message 2).
 - Basic application of python
 - Understanding different data encoding the output the decrypter gave was in hex which needed to be cahnged to decimal using python and also when I provided the input `2` its read it as teh ascii character `50`.
+
+## Notes:
+
+- NONE
 
 ## Resources:
 
@@ -74,6 +73,58 @@ picoCTF{su((3ss_(r@ck1ng_r3@_60f50766}
 # 2. miniRSA
 
 > Let's decrypt this: ciphertext? Something seems a bit small.
+
+## Solution:
+
+- First made the file executable but executing the file did nothing so used `cat` to read the file
+```
+vishalsharan@Vishals-MacBook-Air ~/Downloads % chmod +x ciphertext 
+vishalsharan@Vishals-MacBook-Air ~/Downloads % ./ciphertext 
+./ciphertext: line 2: N:: command not found
+./ciphertext: line 3: e:: command not found
+./ciphertext: line 5: syntax error near unexpected token `c'
+./ciphertext: line 5: `ciphertext (c): 2205316413931134031074603746928247799030155221252519872649649212867614751848436763801274360463406171277838056821437115883619169702963504606017565783537203207707757768473109845162808575425972525116337319108047893250549462147185741761825125 '
+vishalsharan@Vishals-MacBook-Air ~/Downloads % cat ciphertext 
+
+N: 29331922499794985782735976045591164936683059380558950386560160105740343201513369939006307531165922708949619162698623675349030430859547825708994708321803705309459438099340427770580064400911431856656901982789948285309956111848686906152664473350940486507451771223435835260168971210087470894448460745593956840586530527915802541450092946574694809584880896601317519794442862977471129319781313161842056501715040555964011899589002863730868679527184420789010551475067862907739054966183120621407246398518098981106431219207697870293412176440482900183550467375190239898455201170831410460483829448603477361305838743852756938687673
+e: 3
+
+ciphertext (c): 2205316413931134031074603746928247799030155221252519872649649212867614751848436763801274360463406171277838056821437115883619169702963504606017565783537203207707757768473109845162808575425972525116337319108047893250549462147185741761825125
+```
+- The value of `e` is very small in this so if we take the assumption that `m` is significantly smaller, if `m^3` is significantly smaller than `N` then according to Rsa algorithm `c=m^e mod(N)`, `c` would become `m^3`
+- Made a python program that would find an integer cube root of `c` turns it int hex, unhexlify it then decode it.
+
+<img width="1280" height="832" alt="Screenshot 2025-10-28 at 2 34 06 PM" src="https://github.com/user-attachments/assets/4f47d5d9-4112-4c28-b63b-964000563e52" />
+
+- Ran the script to obtain the flag 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-28 at 2 34 40 PM" src="https://github.com/user-attachments/assets/2b9cd90f-1b17-4b34-8759-b0ad90399b25" />
+
+
+## Flag:
+
+```
+picoCTF{n33d_a_lArg3r_e_606ce004}
+```
+
+## Concepts learnt:
+
+- Vulnerabilty in having a very small `e` values in RSA encryption without any padding.
+- To find integer value cube roots the best way is to employ binary search because mathematical functions would give float point value which are not ideal for this case.
+
+## Notes:
+
+- While creating the python program I did run into some indentation errors.
+
+## Resources:
+
+- Gemini helped with the python program
+
+
+***
+# 3. Challenge name
+
+> Put in the challenge's description here
 
 ## Solution:
 
@@ -108,4 +159,6 @@ picoCTF{}
 
 
 ***
+
+
 
