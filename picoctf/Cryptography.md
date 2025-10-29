@@ -122,43 +122,178 @@ picoCTF{n33d_a_lArg3r_e_606ce004}
 
 
 ***
-# 3. Challenge name
+# 3. Custom Encryption 
 
-> Put in the challenge's description here
+> Can you get sense of this code file and write the function that will decode the given encrypted file content.
+Find the encrypted file here flag_info and code file might be good to analyze and get the flag.
+
 
 ## Solution:
 
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
+- Understanding the encryption was a huge task took claude's help to understand the encryption the encryption works in three steps
+  1. Reversing the string
+  2. XOR encrypt
+  3. Multiplication with a special number and key
+
 
 ```
-put codes & terminal outputs here using triple backticks
+from random import randint
+import sys
 
-you may also use ```python for python codes for example
+
+def generator(g, x, p):
+    return pow(g, x) % p
+
+
+def encrypt(plaintext, key):
+    cipher = []
+    for char in plaintext:
+        cipher.append(((ord(char) * key*311)))
+    return cipher
+
+
+def is_prime(p):
+    v = 0
+    for i in range(2, p + 1):
+        if p % i == 0:
+            v = v + 1
+    if v > 1:
+        return False
+    else:
+        return True
+
+
+def dynamic_xor_encrypt(plaintext, text_key):
+    cipher_text = ""
+    key_length = len(text_key)
+    for i, char in enumerate(plaintext[::-1]):
+        key_char = text_key[i % key_length]
+        encrypted_char = chr(ord(char) ^ ord(key_char))
+        cipher_text += encrypted_char
+    return cipher_text
+
+
+def test(plain_text, text_key):
+    p = 97
+    g = 31
+    if not is_prime(p) and not is_prime(g):
+        print("Enter prime numbers")
+        return
+    a = randint(p-10, p)
+    b = randint(g-10, g)
+    print(f"a = {a}")
+    print(f"b = {b}")
+    u = generator(g, a, p)
+    v = generator(g, b, p)
+    key = generator(v, a, p)
+    b_key = generator(u, b, p)
+    shared_key = None
+    if key == b_key:
+        shared_key = key
+    else:
+        print("Invalid key")
+        return
+    semi_cipher = dynamic_xor_encrypt(plain_text, text_key)
+    cipher = encrypt(semi_cipher, shared_key)
+    print(f'cipher is: {cipher}')
+
+
+if __name__ == "__main__":
+    message = sys.argv[1]
+    test(message, "trudeau")
+
 ```
+- To solve this I needed to decrypt the cipher in an descending way this was encrypted meaning i had to first reverse teh multiplication 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-29 at 1 22 46 PM" src="https://github.com/user-attachments/assets/c59ebed7-f082-4495-8198-68ca8d97b7f3" />
+
+- Created a function `decrypt_multiplication` which reverses the multiplication encryption by dividing each cipher number by (key × 311) to recover ASCII values, then converts them to characters
+```
+def decrypt_multiplication(cipher,key) :
+    plaintext=""
+    for num in cipher:
+        original_ord = num // (311 * key) 
+        plaintext+=chr(original_ord)
+    return plaintext 
+```
+- The output is then fed to a function `dynamic_XOR_decrypt` which reverses XOR encryption by XORing each character with the `text_key`, then reverses the string. Since XOR is self-inverse, applying it again with the same key decrypts the text
+
+<img width="1280" height="832" alt="Screenshot 2025-10-29 at 1 59 15 PM" src="https://github.com/user-attachments/assets/b81fa778-586d-40ba-a9e7-fe170d71c405" />
+
+- Called the function to recieve the output, this the final script
+```
+from random import randint
+import sys    
+
+def generator(g,x,p):
+    return pow(g,x) % p
+
+a = 94
+b = 21
+cipher = [131553, 993956, 964722, 1359381, 43851, 1169360, 950105, 321574, 1081658, 613914, 0, 1213211, 306957, 73085, 993956, 0, 321574, 1257062, 14617, 906254, 350808, 394659, 87702, 87702, 248489, 87702, 380042, 745467, 467744, 716233, 380042, 102319, 175404, 248489]
+
+def decrypt_multiplication(cipher,key) :
+    plaintext=""
+    for num in cipher:
+        original_ord = num // (311 * key) 
+        plaintext+=chr(original_ord)
+    return plaintext 
+
+p=97
+g=31
+u = generator(g, a, p)
+v = generator(g, b, p)
+key = generator(v, a, p)
+
+print(key)
+decipher = decrypt_multiplication(cipher, key)
+print(decipher)
+
+def dynamic_xor_decrypt(cipher_text, text_key):
+    plaintext = ""
+    key_length = len(text_key)
+    for i, char in enumerate(cipher_text):
+        key_char = text_key[i % key_length]
+        decrypted_char = chr(ord(char) ^ ord(key_char))
+        plaintext += decrypted_char
+    # Reverse the string since encryption reversed it
+    return plaintext[::-1]
+##text_key= trudeau
+
+print("Flag :",dynamic_xor_decrypt(decipher,"trudeau"))
+
+```
+and the output 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-29 at 2 17 49 PM" src="https://github.com/user-attachments/assets/9418ef25-a3e9-4496-93a5-d02ddcff930c" />
+
+
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{custom_d2cr0pt6d_8b41f976}
 ```
 
 ## Concepts learnt:
 
-- Include the new topics you've come across and explain them in brief
-- 
-
+- Lots of debugging practice
+- XOR encryption takes characters converts them to ASCII and works at a bit level simmilar to XOR gate. Has a self-reversible nature.
+- Understanding multi-layered encryption
+- Reverse engineering the code to understand the encruyption
+- A better undestanding of Python 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- append only works on lists not strings i tried adding value to `decipher` using append by that didn't work
+
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- Claude AI 
 
 
 ***
+
 
 
 
