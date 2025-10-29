@@ -10,7 +10,7 @@
 
 - There were 2 encrypted .txt files instruction and plan used an online ROT13 decoder to decode the files
 
-<img width="1280" height="832" alt="Screenshot 2025-10-29 at 9 13 40 PM" src="https://github.com/user-attachments/assets/e7ac394e-7381-445c-9c60-eebf9f18ba7e" />
+<img width="1280" height="832" alt="Screenshot 2025-10-29 at 9 49 51 PM" src="https://github.com/user-attachments/assets/316b198e-5ea5-4cc0-a720-1965a7e0cc8e" />
 
 - The challenge wanted me to install the program and run stegify with the password `DUEDILIGENCE` 
 
@@ -47,4 +47,5 @@ picoCTF{h1dd3n_1n_pLa1n_51GHT_18375919}
 
 
 ***
+
 
