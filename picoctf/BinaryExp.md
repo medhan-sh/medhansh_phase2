@@ -29,8 +29,16 @@ void sigsegv_handler(int sig) {
 ```
 - So if i overflow the buffer value then the program would give me the flag
 
-<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 54 50 PM" src="https://github.com/user-attachments/assets/5d09e522-2764-4d30-814c-44b2b438f689" />
-
+```
+vishalsharan@Vishals-MacBook-Air ~/Downloads % nc mimas.picoctf.net 58778
+Welcome to our newly-opened burger place Pico 'n Patty! Can you help the picky customers find their favorite burger?
+Here comes the first customer Patrick who wants a giant bite.
+Please choose from the following burgers: Breakf@st_Burger, Gr%114d_Cheese, Bac0n_D3luxe
+Enter your recommendation: Breakf@st_Burger
+Breakf@st_BurgerPatrick is still hungry!
+Try to serve him something of larger size!
+```
+- Examined the source code for vulnerabilities
 
 ## Flag:
 
@@ -89,5 +97,6 @@ picoCTF{}
 
 
 ***
+
 
 
