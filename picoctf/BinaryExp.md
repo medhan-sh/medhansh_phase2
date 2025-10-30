@@ -29,16 +29,9 @@ void sigsegv_handler(int sig) {
 ```
 - So if i overflow the buffer value then the program would give me the flag
 
-```
-vishalsharan@Vishals-MacBook-Air ~/Downloads % nc mimas.picoctf.net 58778
-Welcome to our newly-opened burger place Pico 'n Patty! Can you help the picky customers find their favorite burger?
-Here comes the first customer Patrick who wants a giant bite.
-Please choose from the following burgers: Breakf@st_Burger, Gr%114d_Cheese, Bac0n_D3luxe
-Enter your recommendation: Breakf@st_Burger
-Breakf@st_BurgerPatrick is still hungry!
-Try to serve him something of larger size!
-```
-- Examined the source code for vulnerabilities
+<img width="1127" height="192" alt="Screenshot 2025-10-31 at 12 47 38 AM" src="https://github.com/user-attachments/assets/3f4fa2ca-4b17-4d95-985a-b15a1c715319" />
+
+
 
 ## Flag:
 
@@ -73,30 +66,69 @@ nc mimas.picoctf.net 58778
 
 - After opening the network tried some syntax 
 
-<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 34 42 PM" src="https://github.com/user-attachments/assets/cc405c6a-255a-4c25-9e0f-538cf24a5f8d" />
+<img width="874" height="98" alt="Screenshot 2025-10-31 at 12 47 11 AM" src="https://github.com/user-attachments/assets/37ca8b9f-757a-4428-8748-ecc16341d4d8" />
+
+- In the source code the function `server_patric` takes the input directly inside `printf`, `int count = printf(choice1);`
+```
+void serve_patrick() {
+    printf("%s %s\n%s\n%s %s\n%s",
+            "Welcome to our newly-opened burger place Pico 'n Patty!",
+            "Can you help the picky customers find their favorite burger?",
+            "Here comes the first customer Patrick who wants a giant bite.",
+            "Please choose from the following burgers:",
+            "Breakf@st_Burger, Gr%114d_Cheese, Bac0n_D3luxe",
+            "Enter your recommendation: ");
+    fflush(stdout);
+
+    char choice1[BUFSIZE];
+    scanf("%s", choice1);
+    char *menu1[3] = {"Breakf@st_Burger", "Gr%114d_Cheese", "Bac0n_D3luxe"};
+    if (!on_menu(choice1, menu1, 3)) {
+        printf("%s", "There is no such burger yet!\n");
+        fflush(stdout);
+    } else {
+        int count = printf(choice1);
+        if (count > 2 * BUFSIZE) {
+            serve_bob();
+        } else {
+            printf("%s\n%s\n",
+                    "Patrick is still hungry!",
+                    "Try to serve him something of larger size!");
+            fflush(stdout);
+        }
+    }
+}
+
+```
+- Used `Gr%114d_Cheese` chese for the first layer, the `%114d` format specifier tells printf to print a decimal number with 114 characters of padding, this makes the return count > 64, unlocking the second stage.
+- Simmilarly for the second layer `Cla%sic_Che%s%steak` coz this included three `%s`f format specifiers without any arguments which calls `sigsegv_handler` which prints the flag
+
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 12 53 38 AM" src="https://github.com/user-attachments/assets/ca7fe6a0-34c7-464a-aea2-7c4082d4e43e" />
+
+- Moreover if you examine the the source code the outputs are only defined for two options made it pretty obvious which options to select.
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6
 ```
 
 ## Concepts learnt:
 
-- Include the new topics you've come across and explain them in brief
-- 
+- Format string Vulnerability if the user can input into `printf` we can use format string to exploit.
+
 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- felt more like a reverse engineering challenge
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- https://www.youtube.com/watch?v=0WvrSfcdq1I 
 
 
 ***
+
 
 
 
