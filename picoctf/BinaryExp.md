@@ -53,4 +53,41 @@ picoCTF{ov3rfl0ws_ar3nt_that_bad_9f2364bc}
 
 
 ***
+# 2. format overflow 0 
+
+> Can you use your knowledge of format strings to make the customers happy?
+Download the binary here.
+Download the source here.
+Connect with the challenge instance here:
+nc mimas.picoctf.net 58778
+
+## Solution:
+
+- After opening the network tried some syntax 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 34 42 PM" src="https://github.com/user-attachments/assets/cc405c6a-255a-4c25-9e0f-538cf24a5f8d" />
+
+## Flag:
+
+```
+picoCTF{}
+```
+
+## Concepts learnt:
+
+- Include the new topics you've come across and explain them in brief
+- 
+
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
 
