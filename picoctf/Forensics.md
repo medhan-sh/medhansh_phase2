@@ -84,6 +84,47 @@ picoCTF{}
 
 
 ***
+# 3. m00nwalk
+
+> Decode this message from the moon.
+
+## Solution:
+
+- The hint in this challenge was really helpful a few google searches gave me the solution first opened the file in davinci to observe the audio file but that was no help so started looking on how did we recieve images from the moon landing gave me teh hint for using a SStv decoder 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 25 11 PM" src="https://github.com/user-attachments/assets/a7ccd21f-1adb-40db-9a20-567a91103adb" />
+
+- Used an online SStv decoder to extract the images from the `.wav` file
+
+<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 27 39 PM" src="https://github.com/user-attachments/assets/532f60a3-834b-48cb-a100-0e7ba9c6ae35" />
+
+- Copied the flag from there.
+
+## Flag:
+
+```
+picoCTF{beep_boop_im_in_Space}
+```
+
+## Concepts learnt:
+
+- Steganography tools like SSTV decoder
+- Audio analysis
+
+## Notes:
+
+- NONE
+
+## Resources:
+
+- Google
+<img width="1280" height="832" alt="Screenshot 2025-10-30 at 10 34 44 PM" src="https://github.com/user-attachments/assets/7003da12-9c32-4d87-b3cd-46facb0092f4" />
+
+
+***
+
+
+
 
 
 
