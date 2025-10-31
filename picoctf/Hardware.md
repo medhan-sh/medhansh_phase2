@@ -37,3 +37,39 @@ niteCTF{100010011000}
 
 ***
 
+# 2. I like logic 
+
+> i like logic and i like files, apparently, they have something in common, what should my next step be.
+
+
+## Solution:
+
+- Opened the file on `Logic2`
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 11 29 02 PM" src="https://github.com/user-attachments/assets/7821195b-9f36-41d6-bbbf-1796c0a1aa26" />
+- Started using random analyser till i get an output used `SPI` and `Async Serial` 
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 11 31 41 PM" src="https://github.com/user-attachments/assets/f881a640-73ce-4369-ba15-f0dec7a01b3e" />
+
+- On the terminal there was the output from there retrieved the flag.
+
+## Flag:
+
+```
+FCSC{b1dee4eeadf6c4e60aeb142b0b486344e64b12b40d1046de95c89ba5e23a9925}
+
+```
+
+## Concepts learnt:
+
+- Using Logic2
+
+## Notes:
+
+- None
+
+## Resources:
+
+- None
+
+
+***
+
