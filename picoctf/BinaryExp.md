@@ -19,7 +19,7 @@ void vuln(char *input){
 FILE *f = fopen("flag.txt","r");
 fgets(flag, FLAGSIZE_MAX, f);  // Flag is now in memory
 ```
-- The function prints `stout` if the program fails :
+- The function prints `stdout` if the program fails :
 ```
 void sigsegv_handler(int sig) {
   printf("%s\n", flag);
@@ -250,4 +250,5 @@ picoCTF{c0ntr0ll3d_clutt3r_1n_my_buff3r}
 
 
 ***
+
 
