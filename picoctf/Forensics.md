@@ -53,34 +53,42 @@ picoCTF{h1dd3n_1n_pLa1n_51GHT_18375919}
 
 ## Solution:
 
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
+- First used the command `file` to examine the program gave the output `data` 
 
 ```
-put codes & terminal outputs here using triple backticks
-
-you may also use ```python for python codes for example
+vishalsharan@Vishals-MacBook-Air ~/Downloads % file /Users/vishalsharan/Downloads/tunn3l_v1s10n 
+/Users/vishalsharan/Downloads/tunn3l_v1s10n: data
 ```
+
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 10 20 52 PM" src="https://github.com/user-attachments/assets/0d30c089-9b04-4c5a-9971-71f4bc9ebb5b" />
+
+- Opened the file on an online hex editor and found out the file started with 42 4d which is a `.bmp` file.
+<img width="1280" height="832" alt="Screenshot 2025-10-31 at 10 25 55 PM" src="https://github.com/user-attachments/assets/589802ea-709d-4817-bedb-35b4f484d07f" />
+
+- parts of the file's header, the metadata at the beginning of the file that describes the image, were incorrect.
+- Manually fixed the file and exported it to get an image which contained the flag 
+<img width="568" height="415" alt="Screenshot 2025-10-31 at 10 32 34 PM" src="https://github.com/user-attachments/assets/ad9819cf-9fa2-4a03-bcef-c7bd12d619ad" />
+
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{qu1t3_a_v13w_2020 }
 ```
 
 ## Concepts learnt:
 
-- Include the new topics you've come across and explain them in brief
-- 
+- Introduction to a Hex editor
+- File header magic numbers
+- File repair 
 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- NONE
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- https://www.youtube.com/watch?v=5Vh_YT-nexM
 
 
 ***
@@ -122,6 +130,7 @@ picoCTF{beep_boop_im_in_Space}
 
 
 ***
+
 
 
 
