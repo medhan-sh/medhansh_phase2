@@ -135,7 +135,7 @@ FCCTF{Th1s_1s_som3_s1mpl3_4rdu1no_f1rmw4re}
 ## Notes:
 
 - reading the files was a waste of time
-- using ` ps @ 0x68` command failed because it's looking for a standard, null-terminated (text) string. Your encrypted flag is just raw bytes, and it probably contains a \x00 (null) byte, which makes ps stop immediately.
+- using ` ps @ 0x68` command failed because it's looking for a standard string, encrypted flag is just raw bytes, and it probably contains a \x00 (null) byte, which makes ps stop immediately.
 
 ## Resources:
 
@@ -143,4 +143,5 @@ FCCTF{Th1s_1s_som3_s1mpl3_4rdu1no_f1rmw4re}
 
 
 ***
+
 
