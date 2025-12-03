@@ -1,1 +1,43 @@
+# 1. All Signs Allign
 
+
+## Solution:
+
+- The challenge used the concept of quadratic residue to make an encryption.
+- The core challenge used a function get_x to obtain the value of x as a quadratic residue 
+
+```
+def get_x():
+    while True:
+        x = randint(2,p-1)
+        if pow(x,(p-1)//2,p) == 1:
+            break
+    return x
+```
+
+
+## Flag:
+
+```
+picoCTF{}
+```
+
+## Concepts learnt:
+
+- Include the new topics you've come across and explain them in brief
+- 
+
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
+
+.
