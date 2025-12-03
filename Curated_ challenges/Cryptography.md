@@ -16,6 +16,7 @@ def get_x():
 ```
 
 
+
 ## Flag:
 
 ```
@@ -36,8 +37,3 @@ picoCTF{}
 
 - Include the resources you've referred to with links. [example hyperlink](https://google.com)
 
-
-***
-
-
-.
