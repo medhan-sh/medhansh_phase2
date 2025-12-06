@@ -226,5 +226,99 @@ nite{m10p7rm_d0lu?31_4__Mh7_30mud3l}
 
 
 ***
+# 3. 3. Quixorte
+
+> Put in the challenge's description here
+
+## Solution:
+
+ - The main encryption rotates the bits of an image and takes a randomly generated key and uses an XOR encryption on it and then the bits are multiplied.
+ - To reverse the encryption we first need to retrieve the key, XOR is self reversing but th XOR is sliding so we need to solve it cummulatively 
+ ```
+key = [0]*8
+key[0] = v[0]
+xor_sum = key[0]
+
+for i in range(1, 8):
+    key[i] = v[i] ^ xor_sum
+    xor_sum ^= key[i]
+ ```
+- Since we know that this is a PNG file we already now the first 8 bytes of the file and can use that to compare.
+- Once we have obtained the key we can just use the derypt function which unrotates by left rotation and uses XOR which is self reversing to find the original file.
+```
+def rotate(b, i):
+    r = i % 8
+    return ((b >> r) | (b << (8 - r))) & 0xFF
+
+def unrotate(b, i):
+    r = i % 8
+    return ((b << r) | (b >> (8 - r))) & 0xFF
+
+def decrypt(enc, key):
+    dec = bytearray(enc)
+
+    # Undo sliding XOR in REVERSE
+    for i in range(len(dec) - len(key), -1, -1):
+        for j in range(len(key)):
+            dec[i + j] ^= key[j]
+
+    # Undo rotation
+    return bytearray(unrotate(dec[i], i) for i in range(len(dec)))
+
+# PNG header
+png_header = b"\x89PNG\r\n\x1a\n"
+
+enc = bytearray(open("quote.png.enc","rb").read())
+
+rot = [rotate(png_header[i], i) for i in range(8)]
+v = [enc[i] ^ rot[i] for i in range(8)]
+
+key = [0]*8
+key[0] = v[0]
+xor_sum = key[0]
+
+for i in range(1, 8):
+    key[i] = v[i] ^ xor_sum
+    xor_sum ^= key[i]
+
+key = bytearray(key)
+print("Recovered key:", key.hex())
+
+
+dec = decrypt(enc, key)
+
+with open("decrypted.png","wb") as f:
+    f.write(dec)
+
+print("Done. Check decrypted.png")
+
+```
+- Used an online tool hexedit to check for mistakes
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 12 41 33 AM" src="https://github.com/user-attachments/assets/ec761012-ffad-42cc-b905-3a0a270fa0a4" />
+
+
+## Flag:
+
+<img width="250" height="250" alt="decrypted" src="https://github.com/user-attachments/assets/ee6bd862-49ed-4f3b-8e67-6667092f641d" />
+
+
+## Concepts learnt:
+
+- All PNG file have the same headers.
+- XOR is self reversing.
+- Making use of a triangle XOR system.
+- Since we already know the header of the PNG file i had to compare encrypted bytes with known plaintext.
+
+## Notes:
+
+- The first time i solved this i did not applied a cummulative way of reversing the XOR, which led to having a damaged PNG.
+
+## Resources:
+
+- CHAT GPT
+
+
+***
+
 
 
