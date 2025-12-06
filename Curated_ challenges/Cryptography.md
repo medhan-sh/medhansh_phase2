@@ -89,3 +89,142 @@ else:  # It's a NQR
 - Cluade
 - https://www.youtube.com/watch?v=aBn7BaRxu2g
 
+# 2. Residue Refinery 
+
+
+## Solution:
+
+- The encryption is done in arithmetic modulo `x^2 - 3= 0` and all coefficients were module `257` this is a vulnerability coz the calculations are finite.
+- The main encryption takes two bits from the flag and multiplies it with random integer keys.
+- We are given the cyphertext and the first two bits of the flag, with this information we can find the random key and then reverse the whole encryption.
+- we wound need to the find the modular inverse of the flag bits as `ct=ks*flag` so we define this operation 
+```
+def inverse(self):
+        a, b = self.n
+        det = (a*a - 3*b*b) % self.p
+        
+        if det == 0:
+            raise ValueError("No inverse exists")
+        
+        # Find modular inverse of det
+        det_inv = pow(det, -1, self.p)  
+        
+        c = (a * det_inv) % self.p
+        d = (-b * det_inv) % self.p
+        
+        return Num([c, d])
+```
+- The logic behind it being For (a + bx)^(-1) where x^2 = 3 We need (a + bx)(c + dx) = 1, This means: ac + 3bd = 1 and ad + bc = 0.
+- We first find the keys using 
+```
+ks = ct_num * flag_inv
+```
+- Simmilarly the decryption would follow 
+```
+for i in range(0, len(ct_bytes), 2):
+    
+    ct_block = Num([ct_bytes[i+1], ct_bytes[i]])
+    
+    flag_block = ks_inv * ct_block
+    
+    flag.extend(flag_block.to_bytes())
+```
+The python script is as follows:
+```
+
+class Num:
+    def __init__(self, n):
+        self.n = list(n)
+        self.p = 257
+        self.f = [1, 0, -3]  # reduction polynomial
+    
+    def __add__(self, other):
+        return (self.n + other.n) % self.p
+
+    def __mul__(self, other):
+        prod = [0] * 5
+        for i in range(2):
+            for j in range(2):
+                prod[i + j] += self.n[i] * other.n[j]
+        return Num([(prod[0] + 3*prod[2]) % self.p, prod[1] % self.p])
+
+    def to_bytes(self):
+        return bytes(self.n)[::-1]
+    
+    def inverse(self):
+        a, b = self.n
+        det = (a*a - 3*b*b) % self.p
+        
+        if det == 0:
+            raise ValueError("No inverse exists")
+        
+        # Find modular inverse of det
+        det_inv = pow(det, -1, self.p)  
+        
+        c = (a * det_inv) % self.p
+        d = (-b * det_inv) % self.p
+        
+        return Num([c, d])
+    
+    def __repr__(self):
+        return f"Num({self.n})"
+
+
+flag_known = [49, 109]  # First 2 bytes: '316d'
+ct_hex = '9813d3838178abd17836f3e2e752a99d5cd3fba291205f90c1d0a78b6eca'
+ct_bytes = bytes.fromhex(ct_hex)
+
+
+ct_first = [ct_bytes[1], ct_bytes[0]] 
+print(f"First CT block: {ct_first}")
+
+
+
+flag_num = Num(flag_known)
+ct_num = Num(ct_first)
+
+flag_inv = flag_num.inverse()
+print(f"Flag inverse: {flag_inv}")
+
+ks = ct_num * flag_inv
+print(f"Recovered key: {ks}")
+
+ks_inv = ks.inverse()
+print(f"Key inverse: {ks_inv}")
+
+flag = bytearray()
+
+for i in range(0, len(ct_bytes), 2):
+    
+    ct_block = Num([ct_bytes[i+1], ct_bytes[i]])
+    
+    flag_block = ks_inv * ct_block
+    
+    flag.extend(flag_block.to_bytes())
+
+print(f"\nDecrypted flag: nite{{{flag.decode()}}}")
+
+```
+
+## Flag:
+
+```
+nite{m10p7rm_d0lu?31_4__Mh7_30mud3l}
+```
+
+## Concepts learnt:
+
+- Polynomial Rings : representing the numbers as polynomials a + bx
+- Finding Multiplicative Inverse
+
+## Notes:
+
+
+## Resources:
+
+- Claude.ai
+
+
+***
+
+
