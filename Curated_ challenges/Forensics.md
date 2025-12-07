@@ -1,4 +1,4 @@
-# 1. Hide n Seek 
+[RAR.txt](https://github.com/user-attachments/files/24014018/RAR.txt)# 1. Hide n Seek 
 
 > Description:
 
@@ -96,5 +96,64 @@ nite{h1d3_4nd_s33k_but_w1th_st3g_sdfu9s8}
 
 
 ***
+# 3. RAR of the abyss
+
+> Description:
+
+Two philosophers peer into the networked abyss and swap a secret. Use the secret to decrypt the Abyss’ RAwR and pull your flag from the void.
+
+## Solution:
+
+- First, we opened abyss.pcap in Wireshark to analyze the network traffic.
+
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 11 48 30 AM" src="https://github.com/user-attachments/assets/42ba6667-c152-4470-874a-96a138753fb7" />
+
+- Looked for the protocol hierarchy to find
+TCP traffic (the main communication)
+ICMP (ping packets)
+UDP (DNS, SSDP)
+- Followed the TCP stream to find hex-encoded data, we converted them to reveal
+  stream 0 : "Camus: One must imagine Sisyphus happy but are we happy ?"
+  stream 1 : "Nietzsche: You will be happy after reading my latest work"
+  stream 2 : This starts with "Rar!" - indicating a RAR archive file
+  stream 3 : "Camus: whats the password ?"
+  stream 4 : "Nietzsche: b3y0ndG00dand3vil"
+  stream 5 : "Camus: thanks"
+- Stream 2 had the RAR file and stream 4 had the passphrase, we extracted the RAR file using the tool unrar.
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 11 52 34 AM" src="https://github.com/user-attachments/assets/a9afa27f-9947-41b1-a212-1cd65f4f9229" />
+
+- extracted into a file RAR.txt
+
+
+## Flag:
+
+```
+nite{thus_sp0k3_th3_n3tw0rk_f0r3ns1cs_4n4lyst}
+```
+
+## Concepts learnt:
+
+- Network Traffic analysis : Using Wireshark to inspect captured network packets, following TCP streams to reconstruct conversations.
+- Hex Encoding/Decoding
+- RAR files start with 52 61 72 21 ("Rar!")
+- The "two philosophers" conversation contained the password in plaintextStream 4 revealed: b3y0ndG00dand3vil
+- Tools Used
+
+Wireshark - GUI packet analyzer for visualizing network traffic
+xxd - Hex dump utility for converting between hex and binary
+unrar - Tool for extracting RAR archives
+echo - Used to output hex strings for conversion
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
 
 
