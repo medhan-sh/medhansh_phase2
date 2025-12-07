@@ -1,4 +1,4 @@
-# 1. All Signs Allign
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 4 26 12 PM" src="https://github.com/user-attachments/assets/2607789b-c3e3-4328-ac67-de6c302b8026" /># 1. All Signs Allign
 
 
 ## Solution:
@@ -356,6 +356,110 @@ picoCTF{}
 
 
 ***
+# 4. Willy's Chocolate Expirience
+
+
+## Solution:
+
+- The encryption takes a secret number `ticket = bytes_to_long(enchantment)` which was the flag as an integer.
+- The challenge computes a special function `f(m) = 13^m + 37^m  (mod p)` and calculates f(0) to f(ticket).
+- We were given the last two 'candies'
+- we reversed the function by using the ratio (13A-B)/(37A-B)
+- In the solution we relate A and B 
+13A−B=13(13^(t−1)+37^(t−1))−(13^t+37^t)
+37A−B=13^(t−1)(37−13)
+- we then compute `g` and `r` reduction to discrete logs
+```
+g = (y * inverse(x, p)) % p
+num = (x * A - B) % p
+den = (y * A - B) % p
+r = (-num * inverse(den, p)) % p
+
+```
+- The function BSGS finds x such that base^x = value mod mod
+  It chooses a step size n ≈ sqrt(order) and:
+    >builds baby steps: store base^j for j = 0..n-1 in a hash table.
+    >computes the giant-step multiplier base^{-n} (here implemented via Fermat: base^{(p-1)-n}) and iterates to find       a match.
+- We then use Pohlig–Hellman discrete log, Pohlig–Hellman reduces a big discrete log in a group of composite order into many small discrete logs in prime-power order subgroups, each of which is feasible.
+```
+def pohlig_hellman(g, h, p, factors):
+    mods = []
+    rems = []
+
+    for prime, exp in factors.items():
+        pe = prime ** exp
+
+        g0 = pow(g, (p - 1) // pe, p)
+        h0 = pow(h, (p - 1) // pe, p)
+
+        x_mod = 0
+        cur = 0
+        for k in range(exp):
+            pk1 = prime ** (k + 1)
+            gk = pow(g, (p - 1) // pk1, p)
+
+            t = (h * pow(inverse(pow(g, cur, p), p), 1, p)) % p
+            hk = pow(t, (p - 1) // pk1, p)
+
+            a = baby_step_giant_step(gk, hk, p, bound=prime)
+            cur += a * (prime ** k)
+
+        mods.append(pe)
+        rems.append(cur)
+
+    # CRT to recombine rems mod product(mods)
+    ...
+    return x, M
+
+```
+- mods contains the moduli (the pe values). rems contains the corresponding discrete logs mod pe. Multiply all pe to get M (the overall modulus). Use standard CRT to combine the residues into a single value x modulo M.
+```
+# recombine with CRT
+M = 1
+for m in mods:
+    M *= m
+
+x = 0
+for mi, ai in zip(mods, rems):
+    Mi = M // mi
+    ti = inverse(Mi, mi)
+    x = (x + ai * Mi * ti) % M
+
+return x, M
+
+```
+- get t and convert to bytes.
+
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 4 26 35 PM" src="https://github.com/user-attachments/assets/56250e6d-0177-42e9-8afd-e4eb1dffcd79" />
+
+## Flag:
+
+```
+nite{g0ld3n_t1ck3t_t0_gl4sg0w}
+```
+
+## Concepts learnt:
+
+- Modular Exponentiation
+- modular inverse
+- Reducing an Encryption to a Discrete Logarithm: Find x such that g^x≡h(modp).
+- Reducing an Encryption to a Discrete Logarithm:
+  break the large discrete log into several small discrete logs in prime-power subgroups,
+  solve each using small exponent searches,
+  recombine with CRT.
+
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
 
 
 
