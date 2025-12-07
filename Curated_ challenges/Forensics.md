@@ -164,7 +164,7 @@ Hint:
 I named my Ninetails "j4gjesg4", quite a peculiar name isn't it?
 
 ## Solution:
-
+(IGNORE "HISTORY KA MAP BHEJDO" used my brother's laptop for this, for some reason FTK imager was not working on my system)
 - Extrancting the rar file gave an `.ad1` file loaded that into a ftk imager.
 ![WhatsApp Image 2025-12-07 at 16 03 58](https://github.com/user-attachments/assets/154ccfe1-ee2a-454e-950a-d08330334d3f)
 
