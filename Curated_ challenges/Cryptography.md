@@ -563,7 +563,8 @@ def solve():
 if __name__ == "__main__":
     solve()
 ```
-![Uploading Screenshot 2025-12-07 at 11.48.36 PM.png…]()
+
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 11 51 57 PM" src="https://github.com/user-attachments/assets/ccd9d891-5e75-461e-a00d-24c52bde2e7a" />
 
 
 ## Flag:
