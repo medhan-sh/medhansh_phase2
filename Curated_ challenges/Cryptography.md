@@ -226,7 +226,7 @@ nite{m10p7rm_d0lu?31_4__Mh7_30mud3l}
 
 
 ***
-# 3. 3. Quixorte
+# 3. Quixorte
 
 > Put in the challenge's description here
 
@@ -316,44 +316,6 @@ print("Done. Check decrypted.png")
 ## Resources:
 
 - CHAT GPT
-
-
-***
-# 1. Challenge name
-
-> Put in the challenge's description here
-
-## Solution:
-
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
-
-```
-put codes & terminal outputs here using triple backticks
-
-you may also use ```python for python codes for example
-```
-
-## Flag:
-
-```
-picoCTF{}
-```
-
-## Concepts learnt:
-
-- Include the new topics you've come across and explain them in brief
-- 
-
-## Notes:
-
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
-
-## Resources:
-
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
-
 
 ***
 # 4. Willy's Chocolate Expirience
@@ -450,15 +412,185 @@ nite{g0ld3n_t1ck3t_t0_gl4sg0w}
 
 ## Notes:
 
-- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
-- 
+- I understand the synopsis of these mathemathical idea of these functions but i dont really understand them.
 
 ## Resources:
 
-- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+- Claude.ai
+- Chatgpt
 
 
 ***
+# 5. spACE oddity
+
+
+## Solution:
+
+- The encryption does the following for each submitted hex string m:
+  1. `message = bytes.fromhex(m)`, and it `asserts len(message) % 2 == 1`
+  2. It builds plaintext = message + FLAG.
+  3. t pads plaintext with PKCS#7 to a multiple of 16 bytes.
+  4. It encrypts with AES-ECB using a fixed per-process random KEY and returns the hex ciphertext.
+     > AES-ECB encrypts each 16-byte block independently and deterministically for a fixed key.
+- The odd-length requirement complicates some naive implementations, but it does not prevent the attack. We simply ensure every probe we send has odd length (possible by appending a filler byte where needed) while still causing the server to encrypt predictable blocks.
+- The server requires specific "odd" padding.
+```
+print("getting first byte...")
+pad1 = b'A' * 15
+
+# get the target block
+r.recvuntil(b'input in hex:')
+r.sendline(pad1.hex().encode())
+line = r.recvline().strip().decode()
+target_0 = line[:32] # first block
+```
+- We first solve for the first bit byt feeding 15 A's, by sending 15 'A's, the 16th byte becomes the first byte of the real flag.
+- The server encrypts [15 A's] + [Real Flag]. The first block of this encryption corresponds to [15 A's] + [F0]. We save this encrypted block as target_0.
+```
+flag = ""
+for c in chars:
+    # logic: pad(15) + guess(1) + dummy(15) = 31 bytes (odd)
+    payload = pad1 + c.encode() + (b'A' * 15)
+```
+- Pad(15) + Guess(1) = 16 (Even, invalid)" "Pad(15) + Guess(1) + Dummy(15) = 31 (Odd, valid)
+- We enter a while loop that keeps on iterating till 49 characters
+- After finding the first bit we find all the other characters 2 bits at a time.
+- `padding + known_flag + 2_guess_bytes + dummy = ODD total`
+ - Solves 2 bytes at a time to maintain odd length requirement
+- Calculates padding to align guesses to block boundaries (16 bytes)
+- Brute forces all possible pairs from the charset
+- Matches encrypted blocks to identify correct characters
+
+```
+from pwn import *
+from Crypto.Util.Padding import pad
+import string
+import time
+
+HOST = 'spaesoddity.nitephase.live' 
+PORT = 45673   
+CHARSET = string.ascii_lowercase + string.digits + "-_ABCD{}"
+FULL_CHARSET = string.printable 
+
+def get_process():
+    return remote(HOST, PORT)
+
+def encrypt(io, hex_payload):
+    io.recvuntil(b'input in hex:')
+    io.sendline(hex_payload.encode())
+    try:
+        line = io.recvline().strip().decode()
+        if "Major Tom" in line:
+            return None
+        return line
+    except:
+        return None
+
+def solve():
+    io = get_process()
+    known_flag = ""
+    
+    # Step 1: Solve the first byte (requires 15 bytes padding - ODD)
+    print("[*] Solving byte 0...")
+    pad_len = 15
+    padding = b'A' * pad_len
+    
+    target_hex = encrypt(io, padding.hex())
+    target_block = target_hex[:32]
+    
+    found = False
+    for char in CHARSET:
+        # Pad(15) + Guess(1) = 16 (Even, invalid)
+        # Pad(15) + Guess(1) + Dummy(15) = 31 (Odd, valid)
+        payload = padding + char.encode() + (b'A' * 15)
+        
+        res = encrypt(io, payload.hex())
+        if res and res[:32] == target_block:
+            known_flag += char
+            found = True
+            print(f"[+] Found byte 0: {char}")
+            break
+            
+    if not found:
+        print("[-] Failed to find first byte. Check charset/connection.")
+        return
+
+    # Step 2: Solve remaining bytes in pairs to maintain Odd Padding requirement
+    while len(known_flag) < 49:
+
+        
+        current_block_target_len = (len(known_flag) + 2)
+        pad_len = (16 - (current_block_target_len % 16)) % 16
+        
+        target_block_index = (pad_len + len(known_flag) + 2) // 16 - 1
+        
+        padding = b'A' * pad_len
+        target_hex = encrypt(io, padding.hex())
+        
+        start = target_block_index * 32
+        end = start + 32
+        target_block = target_hex[start:end]
+        
+        print(f"[*] Solving bytes {len(known_flag)} and {len(known_flag)+1}. Padding: {pad_len}. Target Block: {target_block_index}")
+        
+        found_pair = False
+        
+        for c1 in CHARSET:
+            for c2 in CHARSET:
+                guess = (known_flag + c1 + c2).encode()
+                
+                payload = padding + guess + (b'A' * 15)
+                
+                res = encrypt(io, payload.hex())
+                if not res: continue
+                
+                res_block = res[start:end]
+                
+                if res_block == target_block:
+                    known_flag += c1 + c2
+                    print(f"[+] Flag so far: {known_flag}")
+                    found_pair = True
+                    break
+            if found_pair: break
+        
+        if not found_pair:
+            print("[-] Failed to find pair. Exiting.")
+            break
+
+    print(f"\n[SUCCESS] Final Flag: {known_flag}")
+    io.close()
+
+if __name__ == "__main__":
+    solve()
+```
+![Uploading Screenshot 2025-12-07 at 11.48.36 PM.png…]()
+
+
+## Flag:
+
+```
+nite{D4v1d_B0w13-s_0dds_w3r3_n3v3r_1n_y0ur_f4v0r}
+```
+
+## Concepts learnt:
+
+- We can feed random output and then observe the encrypted outputs
+- PKCS#7 padding fills the last AES block with repeated bytes whose value is the number of padding bytes.
+- AES is a block cipher which only encrypts 16 bits at a time
+- ECB has no randomness.
+- Adding "dummy" bytes to maintain odd length
+
+## Notes:
+
+- NONE
+
+## Resources:
+
+- Gemini
+
+
+***
+
 
 
 
