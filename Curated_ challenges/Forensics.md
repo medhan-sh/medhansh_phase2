@@ -216,6 +216,86 @@ Python libraries: pyasn1, cryptography, pycryptodome
 
 ***
 
+# 5. Re:Draw
+
+> description:
+
+Her screen went black and a strange command window flickered to life, lines of text flashed across before everything went silent. Moments later, the system crashed. By sheer luck, we recovered a memory dump. 
+
+Note: There are three stages to this challenge and you will find three flags.
+
+What we know: just before the crash, a black command window flickered across the screen, something in its output might still be visible if you dig through memory. She was drawing when it happened, and remnants of a painting program linger, which could reveal more if inspected in the right way. Finally, a mysterious archive hides deeper in memory, likely holding the last piece of her work.
+
+Hint:
+Learn up on volatility 2 and its various plugins and what they are used for.
+
+## Solution:
+
+- Loading volatility was a huge pain i first loaded vol3 which just confused everything then in a virtual environment i loaded python2 vol2 and neccesary dependencies.
+- The first step in analyzing a Windows memory image is determining the correct profile.
+```
+volatility -f MemoryDump_Lab1.raw imageinfo
+Suggested Profile(s) : Win7SP1x64
+```
+- Since the challenge description mentioned a “black command window” flashing before the crash, the goal was to recover the console buffer.
+Volatility 2 provides the consoles plugin, which extracts text displayed inside cmd.exe windows.
+```
+volatility --profile=Win7SP1x64 -f MemoryDump_Lab1.raw consoles
+C:\Users\SmartNet>St4G3$1
+ZmxhZ3t0aDFzXzFzX3RoM18xc3Rfc3Q0ZzMhIX0=
+```
+```
+(ctf_env) vishalsharan@Vishals-MacBook-Air Downloads % echo 'ZmxhZ3t0aDFzXzFzX3RoM18xc3Rfc3Q0ZzMhIX0=' | base64 -d
+
+flag{th1s_1s_th3_1st_st4g3!!}%  
+```
+- The description stated that the user was drawing before the crash. Volatility’s filescan plugin was used to locate image data or graphics program remnants.
+```
+(ctf_env) vishalsharan@Vishals-MacBook-Air volatility % volatility --profile=Win7SP1x64 -f MemoryDump_Lab1.raw pslist
+(ctf_env) vishalsharan@Vishals-MacBook-Air volatility % volatility --profile=Win7SP1x64 -f MemoryDump_Lab1.raw memdump -p 2424 --dump-dir mspaint_dump/
+```
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 7 07 15 PM" src="https://github.com/user-attachments/assets/1e95911a-e77b-4cf4-8ac8-a42b08de40b4" />
+
+- This shi frying me found the dmp at `pid.2424dmp` used gimp to recover the file .
+- Locate the RAR signature inside WinRAR process memory. Carve out the RAR file from that process dump. Verify it is a RAR archive and that it’s password protected.
+- `file Important_carved.rar`
+```
+volatility -f MemoryDump_Lab1.raw --profile=Win7SP1x64 hashdump > sam_hashes.txt
+Alissa Simpson:1003:aad3b435b51404eeaad3b435b51404ee:f4ff64c8baac57d22f22edc681055ba6:::
+unrar x -p"$PASSWORD" Important_carved.rar Important_extracted/
+```
+- we extract the rar file and we use the hex hash uppercased as the password string we then open the file and read it to recover the flag.
+## Flag:
+
+```
+## Flag1: flag{th1s_1s_th3_1st_st4g3!!}
+
+## Flag2: flag{G00d_BoY_good_girl}
+
+## Flag3: flag{w3ll_3rd_stage_was_easy}
+
+```
+
+## Concepts learnt:
+
+- To not give up even if you dont know what you are doing just trust chat gpt and claude ai and you'll sail through somehow
+- RAR magic headers
+- USING GIMP , hexedit(favourite tool fr)
+- use the hex hash uppercased as the password string
+- recovering memory dumps
+- using volatility framework
+- Windows Credential Storage + NTLM Hashes
+- Password-Protected Archive Analysis
+- Reconstruction 
+
+## Notes:
+
+- This was impossible 
+
+## Resources:
+
+- Chat gpt , claude
+***
 
 
 
