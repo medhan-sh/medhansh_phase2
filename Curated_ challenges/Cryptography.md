@@ -1,4 +1,4 @@
-<img width="1280" height="832" alt="Screenshot 2025-12-07 at 4 26 12 PM" src="https://github.com/user-attachments/assets/2607789b-c3e3-4328-ac67-de6c302b8026" /># 1. All Signs Allign
+# 1. All Signs Allign
 
 
 ## Solution:
