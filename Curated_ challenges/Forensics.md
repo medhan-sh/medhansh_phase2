@@ -1,4 +1,4 @@
-[RAR.txt](https://github.com/user-attachments/files/24014018/RAR.txt)# 1. Hide n Seek 
+# 1. Hide n Seek 
 
 > Description:
 
@@ -154,6 +154,68 @@ echo - Used to output hex strings for conversion
 
 
 ***
+# 4. ninetails
+
+> Description:
+
+Looks like I got a little too clever and hid the flag as a password in Firefox, tucked away like one of NineTails’ many tails. Recover the "logins" and the "key4" and let it guide you to the flag.
+
+Hint:
+I named my Ninetails "j4gjesg4", quite a peculiar name isn't it?
+
+## Solution:
+
+- Extrancting the rar file gave an `.ad1` file loaded that into a ftk imager.
+![WhatsApp Image 2025-12-07 at 16 03 58](https://github.com/user-attachments/assets/154ccfe1-ee2a-454e-950a-d08330334d3f)
+
+- We were looking for two files `login.json` and `keys.db` found 
+![WhatsApp Image 2025-12-07 at 16 03 58 (1)](https://github.com/user-attachments/assets/6ec49bac-5bd0-4328-9b09-0b7b99fa7676)
+
+- We used firepwd in the same directory as the two extracted files, a Python tool specifically designed to decrypt Firefox passwords.
+```
+git clone https://github.com/lclevy/firepwd.git
+cd firepwd
+```
+- Creted a python virtual environment and downloaded the neccessary dependencies
+<img width="1280" height="832" alt="Screenshot 2025-12-07 at 4 08 42 PM" src="https://github.com/user-attachments/assets/6cc7b968-fc47-4b7c-b1d4-61b2530bb62a" />
+- Once firepwd successfully decrypted the files, it revealed several stored login credentials:
+```
+https://www.rehack.xyz: username='warlocksmurf', password='GCTF{m0zarella'
+https://ctftime.org: username='ilovecheese', password='CHEEEEEEEEEEEEEEEEEEEEEEEEEESE'
+https://www.reddit.com: username='bluelobster', password='_f1ref0x_'
+https://www.facebook.com: username='flag', password='SIKE'
+https://warlocksmurf.github.io: username='Man I Love Forensics', password='p4ssw0rd}'
+```
+
+## Flag:
+
+```
+GCTF{m0zarella_f1ref0x_p4ssw0rd}
+```
+
+## Concepts learnt:
+
+- Firefox Password Storage: Firefox uses a two-file system (logins.json + key4.db) to store encrypted passwords
+- Master Password: The key4.db encryption can be protected by a master password, which was hidden in the challenge hint
+- Using firepwd
+- Tools Used
+
+FTK Imager (or similar) - For extracting files from the forensic image
+firepwd - Python tool for decrypting Firefox passwords
+Python libraries: pyasn1, cryptography, pycryptodome
+
+## Notes:
+
+- Include any alternate tangents you went on while solving the challenge, including mistakes & other solutions you found.
+- 
+
+## Resources:
+
+- Include the resources you've referred to with links. [example hyperlink](https://google.com)
+
+
+***
+
 
 
 
