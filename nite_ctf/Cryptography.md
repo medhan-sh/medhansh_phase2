@@ -322,4 +322,241 @@ if __name__ == "__main__":
     main()
 
 ```
+# 3. Stronk Rabin
+
+> rabin weak. I make it stronk. oh no. it broke.
+
+## Solution:
+
+- The vulnerability lies within the server's `DEC` function, the function is returning mutiples of the secret primes.
+```
+    test_values = list(range(2, 60)) 
+    dec_results = {}
+    
+    for val in test_values:
+        enc_val = query(io, "ENC", [val])
+        
+        # THIS IS THE TRIGGER. The server returns a "broken" result here.
+        dec_val = query(io, "DEC", [enc_val])
+        
+        dec_results[val] = dec_val
+```
+- For the exploit we use the concept of GCD the idea is if we find the GCD of two multiples of the same prime it would give us the value of the prime
+```
+factor_set = set()
+    dec_list = list(dec_results.items())
+    
+    # We compare every result against every other result
+    for i in range(len(dec_list)):
+        for j in range(i+1, len(dec_list)):
+            
+            # THE ATTACK: Calculate GCD of two different decrypted values
+            g = gmpy2.gcd(dec_list[i][1], dec_list[j][1])
+            
+            # Filter: If the result is a 200-300 bit number, it's likely one of the primes
+            if 200 < g.bit_length() < 300:
+                factor_set.add(g)
+```
+- `gmpy2.gcd` gives us the raw primes and the `if` statement ensures that we dont include `1`
+- How this works is the script sends simple numbers to the sever and asks it to `ENC` them then `DEC` them retrieve the output and `GCD` it against all the other outputs this will eventually lead us to four prime numbers.
+- Once we have the primes we have to recover the private key, to do that we would have to find the squareroots modulo of each prime number individually
+```
+moduli = [p, q, r, s]
+    roots_per_prime = []
+    
+    for m in moduli:
+        # THE FORMULA: Calculate square root for this specific prime
+        # pow(base, exponent, modulus)
+        root = pow(C, (m + 1) // 4, m)
+        
+        # Save both the positive (+root) and negative (-root) versions
+        roots_per_prime.append((root, (-root) % m))
+```
+- Once we have the four square modulo we have to reassemble them back together into one big number that satisifies neccesary conditions for that we use Chinese remainder Theorem.
+```
+plaintexts = []
+    # Loop 0 to 15 (16 combinations)
+    for i in range(16):
+        selected_roots = []
+        
+        # Pick either the positive or negative root for each prime based on bits
+        for j, (pos_root, neg_root) in enumerate(roots_per_prime):
+            bit = (i >> j) & 1
+            selected_roots.append(neg_root if bit else pos_root)
+        
+        # THE ASSEMBLY: Use CRT to combine the 4 small roots into one big plaintext
+        plaintext = crt(moduli, selected_roots)[0]
+        plaintexts.append(plaintext)
+```
+- We would have 16 candidate messages we convert them to text and check which has the prefix `nite{`
+```
+for i, candidate in enumerate(candidates):
+        try:
+            # Convert the big number to bytes (text)
+            flag_bytes = long_to_bytes(candidate)
+            
+            # Check if the known flag format is present
+            if b'nite{' in flag_bytes:
+                print(f"[+] Flag: {actual_flag}")
+                return actual_flag
+```
+
+## Flag:
+
+```
+nite{rabin_stronk?_no_r4bin_brok3n}
+```
+
+# Script:
+
+```
+#!/usr/bin/env python3
+from pwn import *
+import json
+from Crypto.Util.number import long_to_bytes
+import gmpy2
+from sympy.ntheory.modular import crt
+
+def query(io, func, args):
+    """Send a query to the server"""
+    request = json.dumps({"func": func, "args": args})
+    io.sendline(request.encode())
+    response = json.loads(io.recvline().decode())
+    return response.get("retn")
+
+def is_prime(n):
+    return gmpy2.is_prime(n)
+
+def solve():
+    print("[*] Connecting to server with SSL...")
+    io = remote('stronk.chals.nitectf25.live', 1337, ssl=True)
+    
+    # Receive C
+    msg = io.recvline().decode().strip()
+    c_line = io.recvline().decode().strip()
+    data = json.loads(c_line)
+    C = data['C']
+    
+    print(f"[+] Received C: {C}")
+    
+    # Extract primes via GCD
+    print("\n[*] Extracting prime factors...")
+    
+    test_values = list(range(2, 60))
+    dec_results = {}
+    
+    for val in test_values:
+        enc_val = query(io, "ENC", [val])
+        dec_val = query(io, "DEC", [enc_val])
+        dec_results[val] = dec_val
+    
+    factor_set = set()
+    dec_list = list(dec_results.items())
+    
+    for i in range(len(dec_list)):
+        for j in range(i+1, len(dec_list)):
+            g = gmpy2.gcd(dec_list[i][1], dec_list[j][1])
+            if 200 < g.bit_length() < 300:
+                factor_set.add(g)
+    
+    primes = [f for f in factor_set if is_prime(f)]
+    
+    if len(primes) != 4:
+        print(f"[-] Found {len(primes)} primes, expected 4")
+        io.close()
+        return
+    
+    p, q, r, s = sorted(primes)
+    n = p * q * r * s
+    
+    print(f"[+] Recovered primes (all ≡ 3 mod 4):")
+    print(f"    p = {p.bit_length()} bits")
+    print(f"    q = {q.bit_length()} bits")
+    print(f"    r = {r.bit_length()} bits")
+    print(f"    s = {s.bit_length()} bits")
+    print(f"[+] n = {n.bit_length()} bits")
+
+    moduli = [p, q, r, s]
+    
+    roots_per_prime = []
+    for m in moduli:
+        root = pow(C, (m + 1) // 4, m)
+        roots_per_prime.append((root, (-root) % m))
+    
+    print(f"[+] Computed square roots for each prime")
+    
+    # Generate all 16 possible combinations using CRT
+    plaintexts = []
+    for i in range(16):
+        # Each bit of i determines which root to use
+        selected_roots = []
+        for j, (pos_root, neg_root) in enumerate(roots_per_prime):
+            bit = (i >> j) & 1
+            selected_roots.append(neg_root if bit else pos_root)
+        
+        # Use CRT to combine
+        plaintext = crt(moduli, selected_roots)[0]
+        plaintexts.append(plaintext)
+    
+    print(f"[+] Generated {len(plaintexts)} possible plaintexts via CRT")
+    
+    # Now we need to find which one is the flag
+    # The constraints are: flag < n, 2*flag > n, flag^2 > n
+    
+    candidates = []
+    for pt in plaintexts:
+        # Check constraints
+        if pt < n and 2*pt > n and pt*pt > n:
+            candidates.append(pt)
+            print(f"[*] Candidate satisfies constraints: {pt.bit_length()} bits")
+    
+    print(f"\n[+] Found {len(candidates)} candidates matching constraints")
+
+    for i, candidate in enumerate(candidates):
+        try:
+            flag_bytes = long_to_bytes(candidate)
+            if b'nite{' in flag_bytes:
+                # Extract just the flag part (before any padding)
+                flag_str = flag_bytes.decode('latin-1')
+                # Find the flag
+                start = flag_str.index('nite{')
+                end = flag_str.index('}', start) + 1
+                actual_flag = flag_str[start:end]
+                
+                print(f"\n[!] ========== FOUND FLAG! ==========")
+                print(f"[+] Flag: {actual_flag}")
+                print(f"[!] ===================================")
+                io.close()
+                return actual_flag
+        except:
+            pass
+
+    print("\n[*] Direct candidates didn't work, using server's DEC oracle...")
+    dec_c = query(io, "DEC", [C])
+    print(f"[+] DEC(C) = {dec_c}")
+    
+    
+    print("\n[*] Analyzing relationship between roots and DEC output...")
+    
+    print("\n[*] Testing all 16 CRT plaintexts...")
+    for i, pt in enumerate(plaintexts):
+        try:
+            flag_bytes = long_to_bytes(pt)
+            # Check if it looks like a valid flag (printable ASCII)
+            if all(32 <= b < 127 or b in [10, 13] for b in flag_bytes[:20]):
+                print(f"[*] Plaintext {i}: starts with {flag_bytes[:50]}")
+                if b'nite{' in flag_bytes:
+                    print(f"\n[!] FOUND FLAG!")
+                    print(f"[+] Flag: {flag_bytes.decode()}")
+                    io.close()
+                    return flag_bytes.decode()
+        except:
+            pass
+    
+    print("\n[-] Could not find flag among CRT plaintexts")
+    io.close()
+
+if __name__ == "__main__":
+    solve()
+```
 
