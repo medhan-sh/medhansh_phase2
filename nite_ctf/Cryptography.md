@@ -561,7 +561,7 @@ if __name__ == "__main__":
 ```
 
 
-# Symetric starter 
+# 4. Symetric starter 
 
 # Solution 
 
