@@ -1,22 +1,22 @@
-### 1. LinuxCLI - Shells Basics
+# 1. LinuxCLI - Shells Basics
 
-# Solution:
+### Solution:
 
 - This part was just making use of simple linux commands to reach desired objectives plus some trivia
 - It included shell scripts and using `ls -a` to find hidden files and piping.
 
 ***
-### 2. Phishing - Merry clickmas
+# 2. Phishing - Merry clickmas
 
-# Solution:
+### Solution:
 - This was a tutorial on the social engineering toolkit, we used SET to send mass phishing emails to the recipient `factory@wareville.thm`.
 - We had already set up a realistic looking server that would catch the username and the password, to complete the challenge we had to draft a convincing phishing email that would guide the recipient to our website.
 - We obtained the password from our phishing attack and then used that password to gain access to comapnies critical information on the ammout of toys they are making, this was lowkenuinely fun.
 
 ***
-### 3. Splunk Basics - Did you SIEM?
+# 3. Splunk Basics - Did you SIEM?
 
-# Soltion:
+### Solution:
 - We used splunk to analyse th logs of an infected machine to try and find out the attack.
 - The first part of the challenge was familiarisation with the UI and basic queries like `index=main`.
 - We then inserted a query to find out the the time of hte attack we see a surge in activity from `10-10-2025` to `14-10-2025` with the activity peaking at `12-10-2025`.
